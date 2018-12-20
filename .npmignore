@@ -1,0 +1,8 @@
+dist/
+test/
+node_modules/
+webpack.config.js
+*.log
+*.lock
+yarn-error.log
+.vscode/

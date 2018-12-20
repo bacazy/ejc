@@ -7,7 +7,12 @@ module.exports = {
     // mode: 'development',
 
     entry: {
-        ejc: [path.resolve(__dirname, 'src/index.js')]
+        ejc: [path.resolve(__dirname, 'src/index.js')],
+        cli: path.resolve(__dirname, 'src/cli.js'),
+        document: path.resolve(__dirname, 'src/document.js'),
+        manager: path.resolve(__dirname, 'src/manager.js'),
+        options: path.resolve(__dirname, 'src/options.js'),
+        sheet: path.resolve(__dirname, 'src/sheet.js'),
     },
 
     output: {
@@ -36,5 +41,14 @@ module.exports = {
         ]
     },
 
-    target: 'node'
+    target: 'node',
+
+    optimization: {
+        minimize: false,
+
+        splitChunks: {
+           chunks: 'all'
+        }
+    }
+
 }

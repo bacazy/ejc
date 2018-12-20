@@ -1,7 +1,7 @@
 import program from 'commander';
 
-export const config = {
-    start: 2,
+export const defaultConfig = {
+    start: 1,
     key: 'key',
     format: 'json',
     output: './',
@@ -9,8 +9,13 @@ export const config = {
     metaPrefix: '__@@__'
 }
 
-export function parseOptions(){
-    return program
+const config = {
+    ...defaultConfig,
+    files: []
+}
+
+export function getConfig(){
+    program
         .version('0.0.1', '-v, --version')
         .usage("[options] <file ...>")
         .command("convert <files...>")
@@ -36,6 +41,13 @@ export function parseOptions(){
             }            
         })
         .on('option:force', function () {
-            config.force = true;          
+            config.force = true;
         })
+        .on("command:convert", function(files){
+            files.map(file => {
+                config.files.push(file);
+            });
+        }).parse(process.argv);
+
+    return Promise.resolve(config);
 }

@@ -1,2 +1,4 @@
 # ejc
-excel to json
+excel to json convertor
+
+## usage

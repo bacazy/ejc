@@ -1,15 +1,14 @@
-
+import { defaultConfig } from "./options";
 import Manager from './manager';
-import { parseOptions } from './options';
 
+function _convert(files, options){
+    const manager = new Manager(options);
+    files.map(file => {
+        manager.readFile(file);
+    });
+    manager.convert();
+}
 
-parseOptions()
-    .on("command:convert", function(files){
-        const manager = new Manager();
-        files.map(file => {
-            manager.readFile(file);
-        });
-        manager.convert();
-    })
-    .parse(process.argv);
-
+export function convert(files=[], options={}) {    
+    _convert(files, {...defaultConfig, ...options});
+}

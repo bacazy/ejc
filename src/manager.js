@@ -1,11 +1,15 @@
 
 import XlsxDocument from './document';
-import { config } from './options';
 import fs from 'fs';
 import path from 'path';
 
 class Manager {
     xlsxs = [];
+    config = {}
+
+    constructor(config){
+        this.config = config;
+    }
 
     readFile = (filename) => {
         this.xlsxs.push(new XlsxDocument(filename, config));

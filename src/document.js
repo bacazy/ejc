@@ -5,6 +5,7 @@ import fs from 'fs';
 export default class XslxDocument {
     filename = null;
     config = {};
+    sheets = [];
 
     constructor(filename, config){        
         if(!fs.existsSync(filename)){
@@ -19,6 +20,7 @@ export default class XslxDocument {
     async getData() {
         let workbook = new Excel.Workbook();
         let content = await workbook.xlsx.readFile(this.filename).then(data => {
+            console.log(data);
             return data;
         });
 
