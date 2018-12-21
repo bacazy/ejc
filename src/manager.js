@@ -2,84 +2,73 @@
 import XlsxDocument from './document';
 import fs from 'fs';
 import path from 'path';
+import XLSX from 'xlsx';
 
 class Manager {
     xlsxs = [];
-    config = {}
+    config = {};
 
     constructor(config){
         this.config = config;
     }
 
     readFile = (filename) => {
-        this.xlsxs.push(new XlsxDocument(filename, config));
+        this.xlsxs.push(new XlsxDocument(filename, this.config));
     }
 
-    _validateData = (data) => {
-        let keyMap = new Map();
-        data.map(_d => {
-            let key = _d[config.key];
-            if(keyMap.has(key)){
-                let prev = keyMap.get(key);
-                let pos = {};
-                pos.prev = `${prev[config.metaPrefix + 'FILENAME']}[${prev[config.metaPrefix + 'SHEETNAME']}]`;
-                pos.next = `${_d[config.metaPrefix + 'FILENAME']}[${_d[config.metaPrefix + 'SHEETNAME']}]`;
-                throw `${key} is dulplicated in ${pos.prev} and ${pos.next}`;
+    _convertJSON = (rows) => {
+        let obj={};
+        if(rows.length === 0){
+            return obj;
+        }
+
+        Object.keys(rows[0]).map(k => {
+            if(k !== this.config.key){
+                rows.map(row => {
+                    if(!obj[k]){
+                        obj[k] = {};
+                    }
+                    obj[k][row[this.config.key]] = row[k]; 
+                })
             }
         })
+
+        return obj;
     }
 
     _convert = () => {
-        let data = [];
-        let headers = [];
-        this.xlsxs.map(
-            xlsx => {
-                let {_headers, _data} = xlsx.getData();
-                data = data.concat(_data);
-                headers = headers.concat(_headers);
-            }
-        );
-
-        this._validateData(data);
-
-        let content = {};
-        headers.filter(header => header !== config.key && header.startsWith(config.metaPrefix)).map(header => {
-            content[header] = {
-                header: header,
-                data: {}
-            };
-            data.map(_d => {
-                let key = _d[config.key];
-                if(!key){
-                    console.warn(`col ${config.key} has emplty cell`);
-                }else{
-                    content[header]['data'][key] = _d[key] || "";
-                }
+        let sheets = [];
+        
+        this.xlsxs.map( xlsx => {
+            xlsx.sheets.map(s => {
+                sheets.push(s);
             })
         });
 
-        let result = [];
-        Object.keys(content).map(key => {
-            result.push(content[key]);
-        });
+        let rows = [];
 
-        return result;
+        sheets.map(sheet => {
+            let json = XLSX.utils.sheet_to_json(sheet);
+            rows = [...rows, ...json];
+        }); 
+        
+        return this._convertJSON(rows);
     }
 
     convert = () => {
-        this._write(config.output, this._convert());
+        this._write(this.config.output, this._convert());
     }
 
     _write = (dir, content) => {
-        content.map(_c => {
-            let {header, data} = _c;
-            this._writeToFile(path.resolve(dir, `${header}.${config.format}`), JSON.stringify(data, null, '\t'));
+        Object.keys(content).map(header => {
+            let data = content[header];
+            this._writeToFile(path.resolve(dir, `${header}.${this.config.format}`), JSON.stringify(data, null, '\t'));
         })
     }
 
     _writeToFile = (file, data) => {
         let exists = fs.existsSync(file);
-        if(config.force){
+        if(this.config.force){
             if(exists){
                 console.warn(`${file} will be overrides`);
             }

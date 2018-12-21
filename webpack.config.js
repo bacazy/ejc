@@ -7,12 +7,8 @@ module.exports = {
     // mode: 'development',
 
     entry: {
-        ejc: [path.resolve(__dirname, 'src/index.js')],
-        cli: path.resolve(__dirname, 'src/cli.js'),
-        document: path.resolve(__dirname, 'src/document.js'),
-        manager: path.resolve(__dirname, 'src/manager.js'),
-        options: path.resolve(__dirname, 'src/options.js'),
-        sheet: path.resolve(__dirname, 'src/sheet.js'),
+        ejc: ['@babel/polyfill', path.resolve(__dirname, 'src/index.js')],
+        cli: ['@babel/polyfill', path.resolve(__dirname, 'src/cli.js')],
     },
 
     output: {
@@ -32,6 +28,8 @@ module.exports = {
                 use: [{
                     loader: 'babel-loader',
                     options: {
+                        cacheDirectory: true,
+                        presets: ['@babel/preset-env'],
                         plugins: [
                             "@babel/plugin-proposal-class-properties"
                         ]
@@ -44,11 +42,7 @@ module.exports = {
     target: 'node',
 
     optimization: {
-        minimize: false,
-
-        splitChunks: {
-           chunks: 'all'
-        }
+        minimize: false
     }
 
 }

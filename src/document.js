@@ -1,29 +1,29 @@
 
-import Excel from 'exceljs';
+import XLSX from 'xlsx';
 import fs from 'fs';
 
 export default class XslxDocument {
     filename = null;
-    config = {};
     sheets = [];
 
-    constructor(filename, config){        
+    constructor(filename){        
         if(!fs.existsSync(filename)){
             throw `${filename} does not exists`;
         }
         this.filename = filename;
-        this.config = config;
-
-        this.getData = this.getData.bind(this);
+        this.sheets = this._readSheets();
     }
 
-    async getData() {
-        let workbook = new Excel.Workbook();
-        let content = await workbook.xlsx.readFile(this.filename).then(data => {
-            console.log(data);
-            return data;
-        });
+    getSheets(){
+        return this.sheets;
+    }
 
-        return content;
+    _readSheets() {
+        let s = [];
+        let workbook = XLSX.readFile(this.filename);
+        workbook.SheetNames.map(name => {
+            s.push(workbook.Sheets[name]);
+        });
+        return s;
     }
 }
