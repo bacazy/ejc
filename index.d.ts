@@ -1,4 +1,6 @@
 
 import { convert } from './lib/index';
 
-export default convert;
+export function ejc(files: string[], options?: object){
+    convert(files, options);
+}
