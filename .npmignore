@@ -5,3 +5,4 @@ webpack.config.js
 *.lock
 yarn-error.log
 .vscode/
+src/
